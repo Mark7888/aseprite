@@ -38,3 +38,16 @@ jobs:
       run: |
         cmake --build build --target aseprite --config Release
 
+    - name: Package Application
+      run: |
+        mkdir -p dist
+        cp -r build/bin/aseprite.app dist/
+        cd dist
+        zip -r aseprite-apple-silicon.zip aseprite.app
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: aseprite-apple-silicon
+        path: dist/aseprite-apple-silicon.zip
+        retention-days: 5
