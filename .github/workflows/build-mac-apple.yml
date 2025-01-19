@@ -38,6 +38,11 @@ jobs:
       run: |
         cmake --build build --target aseprite --config Release
 
+    - name: Find Application
+      run: |
+        APP_PATH=$(find . -name "aseprite.app" -type d)
+        echo "Found application at: $APP_PATH"
+
     - name: Package Application
       run: |
         mkdir -p dist
