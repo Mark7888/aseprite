@@ -35,7 +35,9 @@ jobs:
           -DSKIA_LIBRARY_DIR=skia/out/Release-arm64 \
           -DENABLE_UI=ON \
           -DCMAKE_MACOSX_BUNDLE=ON \
-          -DMACOSX_BUNDLE_GUI_IDENTIFIER="org.aseprite.app"
+          -DMACOSX_BUNDLE_GUI_IDENTIFIER="org.aseprite.app" \
+          -DCMAKE_INSTALL_PREFIX=/Applications \
+          -DBUILD_SHARED_LIBS=OFF
 
     - name: Build
       run: |
@@ -44,8 +46,7 @@ jobs:
     - name: Package Application
       run: |
         mkdir -p dist
-        cd build
-        zip -r ../dist/aseprite-apple-silicon.zip bin/
+        zip -r dist/aseprite-apple-silicon.zip build/
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
