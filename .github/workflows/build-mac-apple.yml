@@ -33,11 +33,7 @@ jobs:
           -DLAF_BACKEND=skia \
           -DSKIA_DIR=skia \
           -DSKIA_LIBRARY_DIR=skia/out/Release-arm64 \
-          -DENABLE_UI=ON \
-          -DCMAKE_MACOSX_BUNDLE=ON \
-          -DMACOSX_BUNDLE_GUI_IDENTIFIER="org.aseprite.app" \
-          -DCMAKE_INSTALL_PREFIX=/Applications \
-          -DBUILD_SHARED_LIBS=OFF
+          -DENABLE_UI=ON
 
     - name: Build
       run: |
