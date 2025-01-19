@@ -42,7 +42,9 @@ jobs:
     - name: Package Application
       run: |
         mkdir -p dist
-        zip -r dist/aseprite-apple-silicon.zip build/
+        cd build
+        cp -r bin aseprite_macos
+        zip -r ../dist/aseprite-apple-silicon.zip aseprite_macos
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
