@@ -1,0 +1,54 @@
+name: Build for Intel macOS
+
+on:
+  push:
+    branches:
+      - build-test
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+
+    - name: Install Dependencies
+      run: |
+        brew install cmake ninja
+
+    - name: Install Skia
+      run: |
+        wget https://github.com/aseprite/skia/releases/download/m102-861e4743af/Skia-macOS-Release-x64.zip
+        unzip Skia-macOS-Release-x64.zip -d skia
+
+    - name: Configure CMake
+      run: |
+        cmake -S . -B build -G Ninja \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_OSX_ARCHITECTURES=x86_64 \
+          -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 \
+          -DLAF_BACKEND=skia \
+          -DSKIA_DIR=skia \
+          -DSKIA_LIBRARY_DIR=skia/out/Release-x64 \
+          -DENABLE_UI=ON
+
+    - name: Build
+      run: |
+        cmake --build build --target aseprite --config Release
+
+    - name: Package Application
+      run: |
+        mkdir -p dist
+        cd build
+        cp -r bin aseprite_macos
+        zip -r ../dist/aseprite-intel-macos.zip aseprite_macos
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: aseprite-intel-macos
+        path: dist/aseprite-intel-macos.zip
+        retention-days: 5
