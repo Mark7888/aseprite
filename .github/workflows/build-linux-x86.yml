@@ -1,0 +1,58 @@
+name: Build for x86 Linux
+
+on:
+  push:
+    branches:
+      - build-test
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y \
+          libpixman-1-dev libfreetype6-dev libharfbuzz-dev zlib1g-dev \
+          libx11-dev libxcursor-dev libxi-dev libgl1-mesa-dev
+
+    - name: Install Skia
+      run: |
+        wget https://github.com/aseprite/skia/releases/download/m102-861e4743af/Skia-Linux-Release-x64-libstdc++.zip
+        unzip Skia-Linux-Release-x64-libstdc++.zip -d skia
+
+    - name: Configure CMake
+      run: |
+        cmake -S . -B build -G Ninja \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DLAF_BACKEND=skia \
+          -DSKIA_DIR=skia \
+          -DSKIA_LIBRARY_DIR=skia/out/Release-x64 \
+          -DENABLE_UI=ON \
+          -DCMAKE_EXE_LINKER_FLAGS="-static" \
+          -DCMAKE_MODULE_LINKER_FLAGS="-static" \
+          -DCMAKE_SHARED_LINKER_FLAGS="-static"
+
+    - name: Build
+      run: |
+        cmake --build build --target aseprite --config Release
+
+    - name: Package Application
+      run: |
+        mkdir -p dist
+        cd build
+        cp -r bin aseprite_linux
+        zip -r ../dist/aseprite-linux-x86.zip aseprite_linux
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: aseprite-linux-x86
+        path: dist/aseprite-linux-x86.zip
+        retention-days: 5
